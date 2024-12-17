@@ -1,0 +1,4 @@
+Postgreqsl - pg_restore -U postgres -d test_db /path/to/backup/test_db_YYYYMMDDHHMMSS.sql
+
+
+MariaDB - mysql -u root -p test_db < /path/to/backup/test_db_YYYYMMDDHHMMSS.sql

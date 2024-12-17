@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Run Tests
+      run: npm test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Deploy to Server
+      env:
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        ENV_FILE: ${{ secrets.ENV_FILE }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key
+        chmod 600 private_key
+        scp -i private_key .env $USERNAME@$SERVER_IP:/home/ubuntu/app/.env
+        ssh -i private_key $USERNAME@$SERVER_IP << 'EOF'
+          cd /home/ubuntu/app
+          npm install
+          pm2 restart all
+        EOF

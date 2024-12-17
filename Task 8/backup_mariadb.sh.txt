@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DB_NAME="test_db"
+DB_USER="root"
+BACKUP_DIR="/path/to/backup"
+BACKUP_FILE="$BACKUP_DIR/${DB_NAME}_$(date +%Y%m%d%H%M%S).sql"
+
+mkdir -p $BACKUP_DIR
+mysqldump -u $DB_USER -p --databases $DB_NAME > $BACKUP_FILE
+
+echo "MariaDB database backup complete: $BACKUP_FILE"
